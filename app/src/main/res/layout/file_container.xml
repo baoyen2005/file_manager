@@ -62,11 +62,22 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_marginLeft="10dp"
-                  android:text="20"
-                  android:textColor="@color/cafe"
+                  android:text=""
+
                   android:layout_weight="1"
                   />
+              <TextView
+                  android:id="@+id/textViewOptions"
+                  android:gravity="center"
+                  android:textStyle="bold"
+                  android:text="⋮"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="10dp"
 
+
+                  android:layout_weight="1"
+                  />
 
 
           </LinearLayout>

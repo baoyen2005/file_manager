@@ -11,9 +11,13 @@ import com.example.filesmanager.fragment.CleanFragment
 import com.example.filesmanager.fragment.FileFragment
 import com.example.filesmanager.fragment.ToolFragment
 import com.example.filesmanager.Adapter.ViewPagerAdapter
+import com.example.filesmanager.fragment.FileManagerFragment
+import com.example.filesmanager.utils.IOBackPressed
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var adapter: ViewPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,12 +31,12 @@ class MainActivity : AppCompatActivity() {
     private fun setFragment() {
         val viewPager = findViewById<ViewPager>(R.id.view_pager)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.botton_navigation)
-        val adapter  = ViewPagerAdapter(supportFragmentManager)
+        adapter  = ViewPagerAdapter(supportFragmentManager)
         //Lỗi đoạn này này cậu, nó bị không đúng fragment nên kho0ong tạo đc menu
         // the sua sao c?
         adapter.addFragment(CleanFragment(), "Làm")
         adapter.addFragment(ToolFragment(), "Công cụ")
-        adapter.addFragment(FileFragment(), "Quản lý tập tin")
+        adapter.addFragment(FileManagerFragment(), "Quản lý tập tin")
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
@@ -91,6 +95,21 @@ class MainActivity : AppCompatActivity() {
 //                TODO("Not yet implemented")
 //            }
 //        })
+    }
+
+    override fun onBackPressed() {
+        if (adapter.getItem(2).getChildFragmentManager().getBackStackEntryCount() > 0) {
+            adapter.getItem(2).getChildFragmentManager().popBackStackImmediate();
+        } else {
+
+                super.onBackPressed();
+
+        }
+        val fragment =
+            this.supportFragmentManager.findFragmentById(R.id.fileFragment)
+        (fragment as? IOBackPressed)?.onBackPressed()?.not()?.let {
+            super.onBackPressed();
+        }
     }
 
 }

@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/fileFragment"
     tools:context=".fragment.CleanFragment">
 
     <androidx.appcompat.widget.Toolbar
@@ -33,13 +34,13 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
 
         <androidx.recyclerview.widget.RecyclerView
            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/recycle_internal"/>
     </LinearLayout>
 

@@ -1,19 +1,28 @@
 package com.example.filesmanager.utils
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.FileProvider
+import com.example.filesmanager.BuildConfig
 import java.io.File
 import java.util.*
 
 // lay duong dan file >> folder trong file do
 class FileOpen {
+    // cai nay no bi bug nen t k dung toi no
     fun openFile(context: Context, file :File){
-        val uri : Uri = Uri.parse(file.absolutePath)
-
+//        val uri : Uri = Uri.parse(file.absolutePath)
+        //Uri uri = FileProvider.getUriForFile(MainActivity.this,
+        // BuildConfig.APPLICATION_ID + ".provider",fileImagePath)
+        val uri:Uri = FileProvider.getUriForFile(context,BuildConfig.APPLICATION_ID
+        +".provider",file)
         // Activity A đang muốn xem thông tin đc hiển thị ở Activity B
-        val intent = Intent(Intent.ACTION_VIEW)
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
         if(uri.toString().contains(".doc")){
             intent.setDataAndType(uri,"application/msword")
         }
@@ -50,7 +59,14 @@ class FileOpen {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
         Log.d("TAG2",intent.toString())
-         context.startActivity(intent)
+         try {
+             context.startActivity(intent)
+         }
+         catch (e:ActivityNotFoundException){
+             Toast.makeText(context,
+                 "No Application Available to view",
+                 Toast.LENGTH_SHORT).show();
+         }
 
 
     }

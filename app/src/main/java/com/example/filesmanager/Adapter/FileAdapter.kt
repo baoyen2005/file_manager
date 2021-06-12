@@ -1,6 +1,7 @@
 package com.example.filesmanager.Adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
     }
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
+        val fileItem = fileList[position]
         holder.tvName.text = fileList[position].name
 
         var date: Date = Date()
@@ -30,7 +32,7 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
 
         val simpleDateFormat:SimpleDateFormat = SimpleDateFormat("dd/MM")
         holder.tvTime.text = simpleDateFormat.format(date)
-
+//        fileList[position].name.lowercase(Locale.getDefault()).endsWith(".mp3") <=> fileItem.extension == "mp3"
         if(!fileList[position].isDirectory){
             if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".mp3")|| fileList[position].name.lowercase(
                     Locale.getDefault()
@@ -49,7 +51,7 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
                 holder.imgFile.setImageResource(R.drawable.jpg)
             } else if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".pdf")) {
                 holder.imgFile.setImageResource(R.drawable.pdf)
-            } else if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".doc")) {
+            } else if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".docx")) {
                 holder.imgFile.setImageResource(R.drawable.doc)
             }  else if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".pptx")) {
                 holder.imgFile.setImageResource(R.drawable.ppt)
@@ -76,10 +78,12 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
                 holder.imgFile.setImageResource(R.drawable.folde4)
             }
         }
+
         if (fileList[position].isDirectory) {
-            val files: Array<File> = fileList[position].listFiles()
+            val files = fileList[position].listFiles()
             if (files != null) {
-                val length = files.size
+                var length = files.size
+                Log.d("aaa", "onBindViewHolder: " + length)
                 if (length >= 1) {
                     if (length == 1) {
                         holder.tvSize.text = "$length file"
@@ -89,9 +93,23 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
                 } else {
                     holder.tvSize.text = "empty"
                 }
+            }else {
+                holder.tvSize.text = "empty"
+            }
+
+
+        }
+        // ko phai thu muc thi ko cho an tiep
+        holder.itemView.setOnClickListener {
+            if (listener!= null && fileItem.isDirectory){
+                listener.onItemClick(fileItem)
             }
         }
+        holder.tvOption.setOnClickListener {
 
+            listener.onOptionsMenuClicked(it!!, fileItem)
+
+        }
 
     }
 
@@ -99,7 +117,7 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
         return fileList.size
     }
 
-    inner class FileViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),View.OnClickListener {
+    inner class FileViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tvName : TextView =
             itemView.findViewById(R.id.tv_fileName)
         var tvSize : TextView = itemView.findViewById(R.id.tvFileSize)
@@ -109,19 +127,19 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
         var container : CardView =
             itemView.findViewById(R.id.container)
         var imgFile : ImageView = itemView.findViewById(R.id.img_fileType)
+        var tvOption :TextView = itemView.findViewById(R.id.textViewOptions)
 
-        init {
-            itemView.setOnClickListener  (this)
-        }
-
-        override fun onClick(v: View?) {
-            listener.onItemClick(fileList[position])
-
-        }
 
     }
     interface OnItemClickListener{
         fun onItemClick(file: File)
+        fun  onOptionsMenuClicked(view:View, file: File)
 
+    }
+
+    fun updateData(newList : List<File>){
+        fileList = newList as ArrayList<File>
+        Log.d("aaa", "updateData: "+newList.size)
+        notifyDataSetChanged()
     }
 }
