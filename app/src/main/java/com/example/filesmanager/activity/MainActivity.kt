@@ -1,18 +1,13 @@
 package com.example.filesmanager.activity
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
 import androidx.viewpager.widget.ViewPager
 import com.example.filesmanager.R
 import com.example.filesmanager.fragment.CleanFragment
-import com.example.filesmanager.fragment.FileFragment
 import com.example.filesmanager.fragment.ToolFragment
 import com.example.filesmanager.Adapter.ViewPagerAdapter
 import com.example.filesmanager.fragment.FileManagerFragment
-import com.example.filesmanager.utils.IOBackPressed
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -40,10 +35,6 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
-
-
-
             }
 
             override fun onPageSelected(position: Int) {
@@ -98,18 +89,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (adapter.getItem(2).getChildFragmentManager().getBackStackEntryCount() > 0) {
-            adapter.getItem(2).getChildFragmentManager().popBackStackImmediate();
-        } else {
+//        if (adapter.getItem(2).childFragmentManager.backStackEntryCount > 0) {
+//            adapter.getItem(2).childFragmentManager.popBackStackImmediate()
+//        }
+//
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        }
+        else {
+               // finish()
+                super.onBackPressed()
 
-                super.onBackPressed();
 
         }
-        val fragment =
-            this.supportFragmentManager.findFragmentById(R.id.fileFragment)
-        (fragment as? IOBackPressed)?.onBackPressed()?.not()?.let {
-            super.onBackPressed();
-        }
+//        val fragment =
+//            this.supportFragmentManager.findFragmentById(R.id.fileFragment)
+//        (fragment as? IOBackPressed)?.onBackPressed()?.not()?.let {
+//            super.onBackPressed();
+//        }
     }
 
 }

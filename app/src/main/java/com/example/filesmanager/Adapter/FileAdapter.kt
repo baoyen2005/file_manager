@@ -17,7 +17,8 @@ import java.util.*
 class FileAdapter (private var context: Context, private var fileList: ArrayList<File>, private val listener:OnItemClickListener):
     RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
 
-
+    public var quanlityFile :Int = 0
+    public var lastModified :String?= null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileViewHolder {
         return  FileViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.file_container,parent,false))
@@ -26,12 +27,12 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
         val fileItem = fileList[position]
         holder.tvName.text = fileList[position].name
-
         var date: Date = Date()
         date.time = fileList[position].lastModified() // tra ve int
-
         val simpleDateFormat:SimpleDateFormat = SimpleDateFormat("dd/MM")
         holder.tvTime.text = simpleDateFormat.format(date)
+
+        lastModified = simpleDateFormat.format(date)
 //        fileList[position].name.lowercase(Locale.getDefault()).endsWith(".mp3") <=> fileItem.extension == "mp3"
         if(!fileList[position].isDirectory){
             if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".mp3")|| fileList[position].name.lowercase(
@@ -87,22 +88,40 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
                 if (length >= 1) {
                     if (length == 1) {
                         holder.tvSize.text = "$length file"
+                        quanlityFile = 1
                     } else {
                         holder.tvSize.text = "$length files"
+                        quanlityFile =  length
                     }
                 } else {
                     holder.tvSize.text = "empty"
+                    quanlityFile += 0
                 }
             }else {
                 holder.tvSize.text = "empty"
+                quanlityFile += 0
             }
 
 
         }
+        else{
+            val files = fileList[position]
+            val size  = files.length()
+            if(size >= 1024){
+                var sizeF :Double = (size/1024).toDouble()
+                holder.tvSize.text = "$sizeF Mb"
+            }
+            else
+            {
+                holder.tvSize.text = "$size Kb"
+            }
+        }
+        //quanlityFile = 0
         // ko phai thu muc thi ko cho an tiep
         holder.itemView.setOnClickListener {
             if (listener!= null && fileItem.isDirectory){
                 listener.onItemClick(fileItem)
+               /// listener.onBackPressed(fileItem)
             }
         }
         holder.tvOption.setOnClickListener {
@@ -110,6 +129,10 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
             listener.onOptionsMenuClicked(it!!, fileItem)
 
         }
+
+//        holder.itemView.on
+
+
 
     }
 
@@ -129,12 +152,11 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
         var imgFile : ImageView = itemView.findViewById(R.id.img_fileType)
         var tvOption :TextView = itemView.findViewById(R.id.textViewOptions)
 
-
     }
     interface OnItemClickListener{
         fun onItemClick(file: File)
         fun  onOptionsMenuClicked(view:View, file: File)
-
+      //  fun onBackPressed()
     }
 
     fun updateData(newList : List<File>){
