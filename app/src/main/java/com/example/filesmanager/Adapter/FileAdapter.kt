@@ -13,12 +13,13 @@ import com.example.filesmanager.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class FileAdapter (private var context: Context, private var fileList: ArrayList<File>, private val listener:OnItemClickListener):
     RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
 
-    public var quanlityFile :Int = 0
-    public var lastModified :String?= null
+    var quanlityFile  = ArrayList<Int>()
+    var lastModified = ArrayList<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileViewHolder {
         return  FileViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.file_container,parent,false))
@@ -32,13 +33,11 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
         val simpleDateFormat:SimpleDateFormat = SimpleDateFormat("dd/MM")
         holder.tvTime.text = simpleDateFormat.format(date)
 
-        lastModified = simpleDateFormat.format(date)
-//        fileList[position].name.lowercase(Locale.getDefault()).endsWith(".mp3") <=> fileItem.extension == "mp3"
+       // lastModified.clear()
+        lastModified .add(position,simpleDateFormat.format(date))
         if(!fileList[position].isDirectory){
             if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".mp3")|| fileList[position].name.lowercase(
-                    Locale.getDefault()
-                )
-                    .endsWith(".mp4")) {
+                    Locale.getDefault()).endsWith(".mp4")) {
                 holder.imgFile.setImageResource(R.drawable.mp3)
             } else if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".gif")) {
                 holder.imgFile.setImageResource(R.drawable.gif)
@@ -87,21 +86,26 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
                 Log.d("aaa", "onBindViewHolder: " + length)
                 if (length >= 1) {
                     if (length == 1) {
-                        holder.tvSize.text = "$length file"
-                        quanlityFile = 1
+                        holder.tvSize.text = "1 file"
+                        //quanlityFile.clear()
+                        quanlityFile.add(position,1)
                     } else {
                         holder.tvSize.text = "$length files"
-                        quanlityFile =  length
+                        if(holder.tvSize.text != "empty")
+                          //  quanlityFile.clear()
+                            quanlityFile.add(position,length)
                     }
                 } else {
                     holder.tvSize.text = "empty"
-                    quanlityFile += 0
+                  //  quanlityFile.clear()
+                    if(holder.tvSize.text == "empty")  quanlityFile.add(position,0)
                 }
             }else {
                 holder.tvSize.text = "empty"
-                quanlityFile += 0
+                //quanlityFile.clear()
+                if(holder.tvSize.text == "empty") quanlityFile.add(position,0)
             }
-
+            Log.d("bbbb", quanlityFile.toString())
 
         }
         else{
@@ -121,17 +125,12 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
         holder.itemView.setOnClickListener {
             if (listener!= null && fileItem.isDirectory){
                 listener.onItemClick(fileItem)
-               /// listener.onBackPressed(fileItem)
             }
         }
         holder.tvOption.setOnClickListener {
-
-            listener.onOptionsMenuClicked(it!!, fileItem)
+            listener.onOptionsMenuClicked(it!!, fileItem,position)
 
         }
-
-//        holder.itemView.on
-
 
 
     }
@@ -155,11 +154,12 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
     }
     interface OnItemClickListener{
         fun onItemClick(file: File)
-        fun  onOptionsMenuClicked(view:View, file: File)
+        fun  onOptionsMenuClicked(view:View, file: File,position: Int)
       //  fun onBackPressed()
     }
 
     fun updateData(newList : List<File>){
+       // fileList.clear()
         fileList = newList as ArrayList<File>
         Log.d("aaa", "updateData: "+newList.size)
         notifyDataSetChanged()

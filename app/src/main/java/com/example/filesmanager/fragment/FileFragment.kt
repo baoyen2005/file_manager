@@ -33,6 +33,7 @@ import com.example.filesmanager.activity.MainActivity
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.log
 
 
 class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
@@ -201,12 +202,12 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
     }
 
 
-    override fun onOptionsMenuClicked(view: View, file: File) {
+    override fun onOptionsMenuClicked(view: View, file: File,position:Int) {
         val popupMenu = PopupMenu(context,view)
         popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
             if (item.itemId == R.id.ic_information) {
                 drawerLayoutFile.openDrawer(Gravity.RIGHT)
-                findInformation(file)
+                findInformation(file,position)
 
                 Toast.makeText(context, "Item 1", Toast.LENGTH_SHORT).show()
                 return@OnMenuItemClickListener true
@@ -252,7 +253,7 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
         popupMenu.show()
     }
 
-    private fun findInformation(file: File) {
+    private fun findInformation(file: File,position:Int) {
         val size  = file.length()//Byte
         var sizeMB :Double = 0.toDouble() // Mb
         var sizeGB:Double = 0.toDouble() // GB
@@ -263,58 +264,83 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
         else if(size> 1024*1024){
             sizeGB = (sizeMB)/1024
         }
-
-        if(file.isDirectory && size > 1024*1024 && fileAdapter.quanlityFile>1 ){
+        if(file.isDirectory && size > 1024*1024 && fileAdapter.quanlityFile[position]>1 ){
+            Log.d("yen", fileAdapter.quanlityFile.toString())
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: folder"+
                     "\nKích thước: $sizeGB Gb"+
-                    "\nNội dung: ${fileAdapter.quanlityFile} files"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nNội dung: ${fileAdapter.quanlityFile[position]} files"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
 
         }
-        else if(file.isDirectory && size > 1024*1024 && fileAdapter.quanlityFile == 1 ){
+        else if(file.isDirectory && size > 1024*1024 && fileAdapter.quanlityFile[position] == 1 ){
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: folder"+
                     "\nKích thước: $sizeGB Gb"+
-                    "\nNội dung: ${fileAdapter.quanlityFile} file"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nNội dung: ${fileAdapter.quanlityFile[position]} file"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
 
         }
-        else  if(file.isDirectory && 1024 < size && size< 1024*1024&& fileAdapter.quanlityFile>1 ){
+        else if(file.isDirectory && size > 1024*1024 && fileAdapter.quanlityFile[position] == 0 ){
+            tvInformation!!.text ="${file.name}" +
+                    "\n\nKiểu: folder"+
+                    "\nKích thước: $sizeGB Gb"+
+                    "\nNội dung: 0 file"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
+                    "\nQuy trình: ${file.absolutePath}"
+
+        }
+        else  if(file.isDirectory && 1024 < size && size< 1024*1024&& fileAdapter.quanlityFile[position]>1 ){
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: folder"+
                     "\nKích thước: $sizeMB Mb"+
-                    "\nNội dung: ${fileAdapter.quanlityFile} files"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nNội dung: ${fileAdapter.quanlityFile[position]} files"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
 
         }
-        else  if(file.isDirectory && 1024 < size && size< 1024*1024&& fileAdapter.quanlityFile==1 ){
+        else  if(file.isDirectory && 1024 < size && size< 1024*1024 && fileAdapter.quanlityFile[position]==1 ){
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: folder"+
                     "\nKích thước: $sizeMB Mb"+
-                    "\nNội dung: ${fileAdapter.quanlityFile} file"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nNội dung: ${fileAdapter.quanlityFile[position]} file"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
-
         }
-        else  if(file.isDirectory && size<1024&& fileAdapter.quanlityFile==1 ){
+        else  if(file.isDirectory && 1024 < size && size< 1024*1024 && fileAdapter.quanlityFile[position]==0 ){
+            tvInformation!!.text ="${file.name}" +
+                    "\n\nKiểu: folder"+
+                    "\nKích thước: $sizeMB Mb"+
+                    "\nNội dung: 0 file"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
+                    "\nQuy trình: ${file.absolutePath}"
+        }
+        else  if(file.isDirectory && size<1024&& fileAdapter.quanlityFile[position]==1 ){
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: folder"+
                     "\nKích thước: $size Kb"+
-                    "\nNội dung: ${fileAdapter.quanlityFile} file"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nNội dung: ${fileAdapter.quanlityFile[position]} file"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
 
         }
-        else  if(file.isDirectory && size<1024&& fileAdapter.quanlityFile>1 ){
+        else  if(file.isDirectory && size<1024&& fileAdapter.quanlityFile[position]>1 ){
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: folder"+
                     "\nKích thước: $size Kb"+
-                    "\nNội dung: ${fileAdapter.quanlityFile} files"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nNội dung: ${fileAdapter.quanlityFile[position]} files"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
+                    "\nQuy trình: ${file.absolutePath}"
+
+        }
+        else  if(file.isDirectory && size<1024&& fileAdapter.quanlityFile[position]==1 ){
+            tvInformation!!.text ="${file.name}" +
+                    "\n\nKiểu: folder"+
+                    "\nKích thước: $size Kb"+
+                    "\nNội dung: 0 file"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
 
         }
@@ -322,7 +348,7 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: file"+
                     "\nKích thước: $sizeGB Gb"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
 
         }
@@ -330,7 +356,7 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: file"+
                     "\nKích thước: $sizeMB Mb"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
 
         }
@@ -338,9 +364,8 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
             tvInformation!!.text ="${file.name}" +
                     "\n\nKiểu: file"+
                     "\nKích thước: $size Kb"+
-                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified}"+
+                    "\nSửa đổi lần cuối: ${fileAdapter.lastModified[position]}"+
                     "\nQuy trình: ${file.absolutePath}"
-
         }
     }
 
@@ -365,9 +390,10 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
             object : OnBackPressedCallback(true /* enabled by default */) {
                 @SuppressLint("WrongConstant")
                 override fun handleOnBackPressed() {
-
+                  //  fileList.clear()
                   if(stFileClick.size >1 ){
                       fileList.clear()
+                     // fileAdapter.updateData
                       stFileClick.pop()
                       fileList.addAll(findFiles(File(stFileClick[stFileClick.size-1])))
                       //drawerLayoutFile.closeDrawer(Gravity.RIGHT)
@@ -376,21 +402,20 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
                   else if(stFileClick.size == 1){
                       fileList.clear()
                       fileList.addAll(findFiles(File(Environment.getExternalStorageDirectory().toString())))
-                     // drawerLayoutFile.closeDrawer(Gravity.RIGHT)
-                    //  fileAdapter.notifyDataSetChanged()
                       stFileClick.pop()
-                      //fileAdapter.notifyDataSetChanged()
+
                   }
 
-                     else   if(drawerLayoutFile.isDrawerOpen(Gravity.RIGHT)){
+                     else  if(drawerLayoutFile.isDrawerOpen(Gravity.RIGHT)){
                             drawerLayoutFile.closeDrawer(Gravity.RIGHT)
                         }
                     else{
                       activity?.supportFragmentManager?.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                       (context as Activity).finish()
-                      //fileAdapter.notifyDataSetChanged()
                   }
                     fileAdapter.notifyDataSetChanged()
+                   // fileAdapter.updateData(fileList)
+                    //fileAdapter.n
                 }
             }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
