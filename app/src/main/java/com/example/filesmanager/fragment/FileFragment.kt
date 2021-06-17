@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.*
+import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
@@ -211,10 +212,44 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
 
                 Toast.makeText(context, "Item 1", Toast.LENGTH_SHORT).show()
                 return@OnMenuItemClickListener true
+
+
             } else if (item.itemId == R.id.ic_mark) {
                 Toast.makeText(requireContext(), "Item 2", Toast.LENGTH_SHORT).show()
                 return@OnMenuItemClickListener true
+
             } else if (item.itemId == R.id.ic_rename) {
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Rename")
+
+                var editText :EditText = EditText(context)
+                editText.setText(file.name.toString())
+                builder.setView(editText)
+                builder.setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, id ->
+
+                   var newName:String = editText.text.toString().trim()
+                    if(!newName.isEmpty()){
+                        var current :File = File(file.absolutePath)
+                        var destination :File = File(file.absolutePath.replace(file.name,newName))
+                        if(current.renameTo(destination)){
+                            fileList.set(position,destination)
+                            fileAdapter.notifyDataSetChanged()
+                        }
+                    }
+                    dialog.dismiss()
+                })
+
+                builder.setNegativeButton("No", DialogInterface.OnClickListener { dialog, id ->
+
+
+                    dialog.dismiss()
+                })
+                var alertDialog : AlertDialog = builder.create()
+                alertDialog.show()
+
+
+
+
                 Toast.makeText(context, "doi ten", Toast.LENGTH_SHORT).show()
                 return@OnMenuItemClickListener true
             }
@@ -228,12 +263,8 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
                     dialogYesOrNo(requireContext(),"Delete","Bạn có chắc muốn xóa file không?",
                     DialogInterface.OnClickListener{dialog, id ->
                         val temp = fileList.remove(file)
-
                         fileAdapter.notifyDataSetChanged()
                     })
-
-                //Toast.makeText(context, "Xoá thành công", Toast.LENGTH_SHORT).show()
-
                 return@OnMenuItemClickListener true
             }
             if (item.itemId == R.id.ic_press) {
@@ -369,8 +400,7 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
         }
     }
 
-    fun dialogYesOrNo(context: Context,  title: String, message: String,
-        listener: DialogInterface.OnClickListener
+    fun dialogYesOrNo(context: Context,  title: String, message: String, listener: DialogInterface.OnClickListener
     ) {
         val builder = AlertDialog.Builder(context)
         builder.setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, id ->
@@ -390,14 +420,14 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
             object : OnBackPressedCallback(true /* enabled by default */) {
                 @SuppressLint("WrongConstant")
                 override fun handleOnBackPressed() {
-                  //  fileList.clear()
-                  if(stFileClick.size >1 ){
+
+                  if(stFileClick.size >1||drawerLayoutFile.isDrawerOpen(Gravity.RIGHT) ){
+
                       fileList.clear()
-                     // fileAdapter.updateData
-                      stFileClick.pop()
+
                       fileList.addAll(findFiles(File(stFileClick[stFileClick.size-1])))
-                      //drawerLayoutFile.closeDrawer(Gravity.RIGHT)
-                      //fileAdapter.notifyDataSetChanged()
+                      stFileClick.pop()
+                      drawerLayoutFile.closeDrawer(Gravity.RIGHT)
                   }
                   else if(stFileClick.size == 1){
                       fileList.clear()
@@ -405,17 +435,14 @@ class FileFragment : Fragment(), FileAdapter.OnItemClickListener {
                       stFileClick.pop()
 
                   }
-
-                     else  if(drawerLayoutFile.isDrawerOpen(Gravity.RIGHT)){
+                  else  if(drawerLayoutFile.isDrawerOpen(Gravity.RIGHT)){
                             drawerLayoutFile.closeDrawer(Gravity.RIGHT)
                         }
-                    else{
+                  else{
                       activity?.supportFragmentManager?.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                       (context as Activity).finish()
                   }
                     fileAdapter.notifyDataSetChanged()
-                   // fileAdapter.updateData(fileList)
-                    //fileAdapter.n
                 }
             }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)

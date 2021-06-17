@@ -32,8 +32,6 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
         date.time = fileList[position].lastModified() // tra ve int
         val simpleDateFormat:SimpleDateFormat = SimpleDateFormat("dd/MM")
         holder.tvTime.text = simpleDateFormat.format(date)
-
-       // lastModified.clear()
         lastModified .add(position,simpleDateFormat.format(date))
         if(!fileList[position].isDirectory){
             if (fileList[position].name.lowercase(Locale.getDefault()).endsWith(".mp3")|| fileList[position].name.lowercase(
@@ -87,17 +85,14 @@ class FileAdapter (private var context: Context, private var fileList: ArrayList
                 if (length >= 1) {
                     if (length == 1) {
                         holder.tvSize.text = "1 file"
-                        //quanlityFile.clear()
                         quanlityFile.add(position,1)
                     } else {
                         holder.tvSize.text = "$length files"
                         if(holder.tvSize.text != "empty")
-                          //  quanlityFile.clear()
                             quanlityFile.add(position,length)
                     }
                 } else {
                     holder.tvSize.text = "empty"
-                  //  quanlityFile.clear()
                     if(holder.tvSize.text == "empty")  quanlityFile.add(position,0)
                 }
             }else {
